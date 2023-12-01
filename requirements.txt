@@ -1,0 +1,6 @@
+fastapi
+redis
+uvicorn
+sqlmodel
+psycopg2-binary
+faker
