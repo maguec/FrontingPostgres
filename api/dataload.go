@@ -1,11 +1,15 @@
 package api
 
 import (
+	"bytes"
+	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 
 	"github.com/brianvoe/gofakeit/v6"
 	"github.com/gin-gonic/gin"
+	"github.com/redis/rueidis"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 )
@@ -34,12 +38,24 @@ func genProfiles(count int) []Profile {
 	return profiles
 }
 
-func loadProfiles(count int, db *gorm.DB) error {
+func loadProfiles(count int, db *gorm.DB, redis rueidis.Client) error {
 	var w []Profile
 	var err error
+	var p bytes.Buffer
+	ctx := context.Background()
 	profiles := genProfiles(count)
 	db.AutoMigrate(&Profile{})
 	for i := 0; i < len(profiles); i++ {
+
+		val, _ := json.Marshal(&profiles[i])
+
+		kn := fmt.Sprintf("profile:%d", profiles[i].ID)
+		err = redis.Do(ctx, redis.B().Set().Key(kn).Value(string(val)).Build()).Error()
+		if err != nil {
+			return err
+		}
+		p.Reset()
+
 		w = append(w, profiles[i])
 		if len(w) == 500 {
 			err = db.Clauses(clause.OnConflict{UpdateAll: true}).Create(&w).Error
@@ -56,10 +72,11 @@ func loadProfiles(count int, db *gorm.DB) error {
 }
 
 func Dataload(c *gin.Context) {
-	record_count := 100000
+	record_count := 10
 	err := loadProfiles(
 		record_count,
 		c.MustGet("db").(*gorm.DB),
+		c.MustGet("redis").(rueidis.Client),
 	)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
