@@ -2,7 +2,9 @@ package api
 
 import (
 	"github.com/gin-gonic/gin"
-	//"github.com/redis/rueidis"
+	"gorm.io/gorm"
+
+	"fmt"
 	"net/http"
 	"strconv"
 )
@@ -13,15 +15,21 @@ func Lookup(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "could not conver id to integer"})
 		return
 	}
+	db := c.MustGet("db").(*gorm.DB)
+	var profile Profile
+	db.Where(&Profile{SecondaryId: fmt.Sprintf("user%d", id)}).First(&profile)
 
-	c.JSON(http.StatusOK, gin.H{
-		"setup": c.MustGet("setup").(string),
-		"id":    id,
-	})
-}
+	if db.Error != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
 
-func Dataload(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{
-		"message": "loading data",
-	})
+	if profile.ID == 0 {
+		c.JSON(http.StatusNotFound, gin.H{
+			"error": fmt.Sprintf("profile for user%d not found", id),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, profile)
 }

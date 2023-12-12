@@ -1,15 +1,18 @@
 package main
 
 import (
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"github.com/maguec/redisfrontingpostgres/api"
 	"github.com/redis/rueidis"
-	"net/http"
+	"gorm.io/gorm"
 )
 
-func APIMiddleWare(redisConn rueidis.Client) gin.HandlerFunc {
+func APIMiddleWare(redisConn rueidis.Client, dbconn *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		c.Set("redis", redisConn)
+		c.Set("db", dbconn)
 		c.Next()
 	}
 }
@@ -22,11 +25,13 @@ func main() {
 		panic(err)
 	}
 
+	dbconn := api.DbConn("localhost", 5432, "postgres", "PgDbFTW15", "profiles")
+
 	router := gin.New()
 	var setup string
 	setup = "initial"
 
-	router.Use(APIMiddleWare(client))
+	router.Use(APIMiddleWare(client, dbconn))
 
 	router.PATCH("/config/:setup", func(c *gin.Context) {
 		setup = c.Param("setup")
