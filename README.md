@@ -3,16 +3,20 @@
 
 ## Setting up environment
 
-```
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-```
+Install go version 1.21 or higher
 
 ## running the webserver
 
 ```
-uvicorn app:app --reload --host 0.0.0.0
+go run fronting.go 
+```
+
+## loading data 
+
+The following command will load 100K records
+
+```
+curl -s -X POST http://localhost:8080/load 
 ```
 
 ## running the locust job
@@ -20,3 +24,16 @@ uvicorn app:app --reload --host 0.0.0.0
 ```
 http://localhost:8099/
 ```
+
+## enabling caching mode
+
+```
+curl -X PATCH http://localhost:8080/config/caching
+```
+
+### disabling caching mode (default)
+
+```
+curl -X PATCH http://localhost:8080/config/initial
+```
+
