@@ -12,6 +12,7 @@ import (
 	"github.com/redis/rueidis"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
+	"gorm.io/hints"
 )
 
 func generateProfile(id int) Profile {
@@ -58,14 +59,16 @@ func loadProfiles(count int, db *gorm.DB, redis rueidis.Client) error {
 
 		w = append(w, profiles[i])
 		if len(w) == 500 {
-			err = db.Clauses(clause.OnConflict{UpdateAll: true}).Create(&w).Error
+			//err = db.Clauses(clause.OnConflict{UpdateAll: true}).Create(&w).Error
+			err = db.Clauses(hints.CommentAfter("returning", "route='/load',module='api.Dataload'")).Clauses(clause.OnConflict{UpdateAll: true}).Create(&w).Error
 			if err != nil {
 				return err
 			}
 			w = nil
 		}
 		if len(w) > 0 {
-			err = db.Clauses(clause.OnConflict{UpdateAll: true}).Create(&w).Error
+			//	err = db.Clauses(clause.OnConflict{UpdateAll: true}).Create(&w).Error
+			err = db.Clauses(hints.CommentAfter("returning", "route='/load',module='api.Dataload'")).Clauses(clause.OnConflict{UpdateAll: true}).Create(&w).Error
 		}
 	}
 	return err

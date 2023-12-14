@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/redis/rueidis"
 	"gorm.io/gorm"
+	"gorm.io/hints"
 
 	"fmt"
 	"net/http"
@@ -39,7 +40,7 @@ func Lookup(c *gin.Context) {
 		}
 	}
 	db := c.MustGet("db").(*gorm.DB)
-	db.Where(&Profile{SecondaryId: fmt.Sprintf("user%d", id)}).First(&profile)
+	db.Clauses(hints.CommentAfter("limit", "route='/lookup',module='api.Lookup'")).Where(&Profile{SecondaryId: fmt.Sprintf("user%d", id)}).First(&profile)
 
 	if db.Error != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
