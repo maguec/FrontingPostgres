@@ -6,6 +6,7 @@ require (
 	github.com/brianvoe/gofakeit/v6 v6.26.0
 	github.com/gin-gonic/gin v1.9.1
 	github.com/redis/rueidis v1.0.23
+	gitlab.com/avarf/getenvs v1.0.1
 	gorm.io/driver/postgres v1.5.4
 	gorm.io/gorm v1.25.5
 	gorm.io/hints v1.1.2

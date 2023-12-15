@@ -1,7 +1,10 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
+
+	"gitlab.com/avarf/getenvs"
 
 	"github.com/gin-gonic/gin"
 	"github.com/maguec/redisfrontingpostgres/api"
@@ -18,14 +21,22 @@ func APIMiddleWare(redisConn rueidis.Client, dbconn *gorm.DB) gin.HandlerFunc {
 }
 
 func main() {
+	dbserver := getenvs.GetEnvString("DB_SERVER", "localhost")
+	dbport, _ := getenvs.GetEnvInt("DB_PORT", 5432)
+	dbuser := getenvs.GetEnvString("DB_USER", "postgres")
+	dbpassword := getenvs.GetEnvString("DB_PASSWORD", "PgDbFTW15")
+	dbname := getenvs.GetEnvString("DB_NAME", "profiles")
+	redisserver := getenvs.GetEnvString("REDIS_SERVER", "localhost")
+	redisport, _ := getenvs.GetEnvInt("REDIS_PORT", 6379)
+
 	client, err := rueidis.NewClient(rueidis.ClientOption{
-		InitAddress: []string{"localhost:6379"},
+		InitAddress: []string{fmt.Sprintf("%s:%d", redisserver, redisport)}, // []string{"localhost:6379"},
 	})
 	if err != nil {
 		panic(err)
 	}
 
-	dbconn := api.DbConn("localhost", 5432, "postgres", "PgDbFTW15", "profiles")
+	dbconn := api.DbConn(dbserver, dbport, dbuser, dbpassword, dbname)
 
 	router := gin.New()
 	var setup string

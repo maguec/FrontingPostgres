@@ -5,6 +5,19 @@
 
 Install go version 1.21 or higher
 
+## webserver configuration
+
+| Environment Variable | Value |
+|:---|:---|
+| PORT         | 8080 |
+| DB_SERVER    | localhost |
+| DB_PORT      | 5432 |
+| DB_USER      | postgres|
+| DB_PASSWORD  | PgDbFTW15|
+| DB_NAME      | profiles|
+| REDIS_SERVER | localhost|
+| REDIS_PORT   | 6379 |
+
 ## running the webserver
 
 ```
