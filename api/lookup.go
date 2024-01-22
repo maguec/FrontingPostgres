@@ -16,14 +16,16 @@ import (
 
 func Lookup(c *gin.Context) {
 	var profile Profile
+	var redisLoad bool
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "could not conver id to integer"})
 		return
 	}
 	setup := c.MustGet("setup").(string)
+	redis := c.MustGet("redis").(rueidis.Client)
+
 	if setup == "caching" {
-		redis := c.MustGet("redis").(rueidis.Client)
 		kn := fmt.Sprintf("profile:%d", id)
 		val, err := redis.Do(context.Background(), redis.B().Get().Key(kn).Build()).ToString()
 		if err == nil && val != "" {
@@ -37,6 +39,9 @@ func Lookup(c *gin.Context) {
 			c.JSON(http.StatusOK, profile)
 			// IF we find in Redis - return it
 			return
+		} else {
+			// Load the record to Redis later
+			redisLoad = true
 		}
 	}
 	db := c.MustGet("db").(*gorm.DB)
@@ -52,6 +57,16 @@ func Lookup(c *gin.Context) {
 			"error": fmt.Sprintf("profile for user%d not found", id),
 		})
 		return
+	}
+
+	if redisLoad {
+		val, _ := json.Marshal(&profile)
+		kn := fmt.Sprintf("profile:%d", id)
+		err = redis.Do(context.Background(), redis.B().Set().Key(kn).Value(string(val)).Build()).Error()
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
 	}
 
 	c.JSON(http.StatusOK, profile)
