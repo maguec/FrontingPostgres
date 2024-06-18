@@ -21,11 +21,11 @@ func APIMiddleWare(redisConn rueidis.Client, dbconn *gorm.DB) gin.HandlerFunc {
 }
 
 func main() {
-	dbserver := getenvs.GetEnvString("DB_SERVER", "localhost")
-	dbport, _ := getenvs.GetEnvInt("DB_PORT", 5432)
-	dbuser := getenvs.GetEnvString("DB_USER", "postgres")
-	dbpassword := getenvs.GetEnvString("DB_PASSWORD", "PgDbFTW15")
-	dbname := getenvs.GetEnvString("DB_NAME", "profiles")
+	dbserver := getenvs.GetEnvString("PGHOST", "localhost")
+	dbport, _ := getenvs.GetEnvInt("PGPORT", 5432)
+	dbuser := getenvs.GetEnvString("PGUSER", "postgres")
+	dbpassword := getenvs.GetEnvString("PGPASSWORD", "PgDbFTW15")
+	dbname := getenvs.GetEnvString("PGDB", "profiles")
 	redisserver := getenvs.GetEnvString("REDIS_SERVER", "localhost")
 	redisport, _ := getenvs.GetEnvInt("REDIS_PORT", 6379)
 
