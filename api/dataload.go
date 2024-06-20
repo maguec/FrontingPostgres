@@ -62,7 +62,7 @@ func loadProfiles(count int, db *gorm.DB, redis rueidis.Client) error {
 }
 
 func Dataload(c *gin.Context) {
-	record_count := 100000
+	record_count := c.MustGet("datasize").(int)
 	err := loadProfiles(
 		record_count,
 		c.MustGet("db").(*gorm.DB),

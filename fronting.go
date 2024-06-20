@@ -12,10 +12,11 @@ import (
 	"gorm.io/gorm"
 )
 
-func APIMiddleWare(redisConn rueidis.Client, dbconn *gorm.DB) gin.HandlerFunc {
+func APIMiddleWare(redisConn rueidis.Client, dbconn *gorm.DB, datasize int) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		c.Set("redis", redisConn)
 		c.Set("db", dbconn)
+		c.Set("datasize", datasize)
 		c.Next()
 	}
 }
@@ -23,6 +24,7 @@ func APIMiddleWare(redisConn rueidis.Client, dbconn *gorm.DB) gin.HandlerFunc {
 func main() {
 	dbserver := getenvs.GetEnvString("PGHOST", "localhost")
 	dbport, _ := getenvs.GetEnvInt("PGPORT", 5432)
+	datasize, _ := getenvs.GetEnvInt("DATASIZE", 100000)
 	dbuser := getenvs.GetEnvString("PGUSER", "postgres")
 	dbpassword := getenvs.GetEnvString("PGPASSWORD", "PgDbFTW15")
 	dbname := getenvs.GetEnvString("PGDB", "profiles")
@@ -44,7 +46,7 @@ func main() {
 	var setup string
 	setup = "initial"
 
-	router.Use(APIMiddleWare(client, dbconn))
+	router.Use(APIMiddleWare(client, dbconn, datasize))
 
 	router.PATCH("/config/:setup", func(c *gin.Context) {
 		setup = c.Param("setup")
