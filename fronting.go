@@ -28,9 +28,11 @@ func main() {
 	dbname := getenvs.GetEnvString("PGDB", "profiles")
 	redisserver := getenvs.GetEnvString("REDIS_SERVER", "localhost")
 	redisport, _ := getenvs.GetEnvInt("REDIS_PORT", 6379)
+	rediscache, _ := getenvs.GetEnvBool( "REDIS_CACHE", false,) // By default we do not use redis client side caching
 
 	client, err := rueidis.NewClient(rueidis.ClientOption{
 		InitAddress: []string{fmt.Sprintf("%s:%d", redisserver, redisport)}, // []string{"localhost:6379"},
+    DisableCache: !rediscache,
 	})
 	if err != nil {
 		panic(err)
