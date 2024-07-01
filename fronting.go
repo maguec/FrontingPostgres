@@ -31,9 +31,15 @@ func main() {
 	redisserver := getenvs.GetEnvString("REDIS_SERVER", "localhost")
 	redisport, _ := getenvs.GetEnvInt("REDIS_PORT", 6379)
 	rediscache, _ := getenvs.GetEnvBool( "REDIS_CACHE", false,) // By default we do not use redis client side caching
+	rediscluster, _ := getenvs.GetEnvBool( "REDIS_CLUSTER", false,) // By default we do use the Redis Cluster API
+
+  endpoints := []string{fmt.Sprintf("%s:%d", redisserver, redisport)}
+  if rediscluster {
+    endpoints = append(endpoints, fmt.Sprintf("%s:%d", redisserver, redisport))
+  }
 
 	client, err := rueidis.NewClient(rueidis.ClientOption{
-		InitAddress: []string{fmt.Sprintf("%s:%d", redisserver, redisport)}, // []string{"localhost:6379"},
+		InitAddress: endpoints,
     DisableCache: !rediscache,
 	})
 	if err != nil {

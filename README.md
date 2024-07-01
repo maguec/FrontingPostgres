@@ -15,17 +15,19 @@ Install go version 1.21 or higher
 
 ## webserver configuration
 
-| Environment Variable | Value     | Use                |
-|----------------------|-----------|--------------------|
-| PORT                 | 8080      | Web server port    |
-| PGHOST               | localhost | Postgres server    |
-| PGPORT               | 5432      | Postgres port      |
-| PGUSER               | postgres  | Postgres user      |
-| PGPASSWORD           | PgDbFTW15 | Postgres password  |
-| PGDB                 | profiles  | Postgres database  |
-| REDIS_SERVER         | localhost | Redis server       |
-| REDIS_PORT           | 6379      | Redis port         |
-| DATASIZE             | 100000    | Number of profiles |
+| Environment Variable | Value     | Use                                   |
+|----------------------|-----------|---------------------------------------|
+| PORT                 | 8080      | Web server port                       |
+| PGHOST               | localhost | Postgres server                       |
+| PGPORT               | 5432      | Postgres port                         |
+| PGUSER               | postgres  | Postgres user                         |
+| PGPASSWORD           | PgDbFTW15 | Postgres password                     |
+| PGDB                 | profiles  | Postgres database                     |
+| REDIS_SERVER         | localhost | Redis server                          |
+| REDIS_PORT           | 6379      | Redis port                            |
+| REDIS_CACHE          | False     | Use near cache (set REDIS_CACHE=1)    |
+| REDIS_CLUSTER        | False     | Use Cluster API (set REDIS_CLUSTER=1) |
+| DATASIZE             | 100000    | Number of profiles                    |
 
 ## starting the data services
 
