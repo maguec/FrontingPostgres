@@ -27,7 +27,9 @@ Install go version 1.21 or higher
 | REDIS_PORT           | 6379      | Redis port                            |
 | REDIS_CACHE          | False     | Use near cache (set REDIS_CACHE=1)    |
 | REDIS_CLUSTER        | False     | Use Cluster API (set REDIS_CLUSTER=1) |
+| DEBUG                | False     | Use Gin framwork debug (set DEBUG=1)  |
 | DATASIZE             | 100000    | Number of profiles                    |
+| LOGFILE              | ""        | Log file (defaults to stdout/stderr)  |
 
 ## starting the data services
 

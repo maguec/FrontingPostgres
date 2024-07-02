@@ -5,6 +5,7 @@ import (
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
 type Profile struct {
@@ -23,9 +24,13 @@ func DbConn(
 	host string, port int, user string,
 	password string, dbname string) *gorm.DB {
 	dsn := fmt.Sprintf("host=%s port=%d user=%s dbname=%s password=%s sslmode=disable", host, port, user, dbname, password)
-	db, err := gorm.Open(postgres.New(postgres.Config{
-		DSN: dsn,
-	}), &gorm.Config{})
+	db, err := gorm.Open(
+		postgres.New(postgres.Config{
+			DSN: dsn,
+		}),
+		&gorm.Config{
+			Logger: logger.Default.LogMode(logger.Silent),
+		})
 	if err != nil {
 		panic(err)
 	}

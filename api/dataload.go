@@ -2,14 +2,15 @@ package api
 
 import (
 	"fmt"
+	"time"
 	"net/http"
 
 	"github.com/brianvoe/gofakeit/v6"
 	"github.com/gin-gonic/gin"
-	"github.com/redis/rueidis"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 	"gorm.io/hints"
+  "go.uber.org/zap"
 )
 
 func generateProfile(id int) Profile {
@@ -36,7 +37,7 @@ func genProfiles(count int) []Profile {
 	return profiles
 }
 
-func loadProfiles(count int, db *gorm.DB, redis rueidis.Client) error {
+func loadProfiles(count int, db *gorm.DB) error {
 	var w []Profile
 	var err error
 	//var p bytes.Buffer
@@ -63,15 +64,18 @@ func loadProfiles(count int, db *gorm.DB, redis rueidis.Client) error {
 
 func Dataload(c *gin.Context) {
 	record_count := c.MustGet("datasize").(int)
+  logger := c.MustGet("logger").(*zap.SugaredLogger)
+  start := time.Now()
 	err := loadProfiles(
 		record_count,
 		c.MustGet("db").(*gorm.DB),
-		c.MustGet("redis").(rueidis.Client),
 	)
 	if err != nil {
+    logger.Errorw("dataload", "error", err, "elapsed", time.Since(start).Milliseconds(), "record_count", record_count)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
+  logger.Infow("dataload", "elapsed", time.Since(start).String(), "record_count", record_count)
 	c.JSON(http.StatusOK, gin.H{
 		"profiles_loaded": record_count,
 	})
